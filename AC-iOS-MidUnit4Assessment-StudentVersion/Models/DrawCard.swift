@@ -9,7 +9,7 @@
 import Foundation
 
 struct Deck: Codable{
-    let cards: [Card]
+    let cards: [Card]?
     let deck_id: String
     let remaining: Int
     let success: Bool

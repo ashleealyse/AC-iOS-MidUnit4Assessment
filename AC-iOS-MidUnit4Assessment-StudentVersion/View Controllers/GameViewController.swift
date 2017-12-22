@@ -20,18 +20,32 @@ class GameViewController: UIViewController {
     //Actions:
     
     @IBAction func drawAction(_ sender: UIButton) {
-        
+        counter += 1
+        print("button pressed \(counter) times")
         ID = newDeck.deck_id
         loadCards()
+       
+//        cardArr.append(currentCard)
     }
     
     
     //Variables
-    var newDeck: NewDeck!
-    var currentDeck: Deck!
+    var counter = 0
+    var newDeck: NewDeck! {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
+    
+    var currentDeck: Deck? {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
     var ID = ""
     var cellSpacing = UIScreen.main.bounds.size.width * 0.05
-    
+//    var cardArr = [Card]()
+//    var currentCard: Card!
     //View Did Load
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,25 +60,27 @@ class GameViewController: UIViewController {
         drawButton.layer.borderColor = UIColor.white.cgColor
         drawButton.layer.borderWidth = 2.0
         drawButton.layer.cornerRadius = drawButton.frame.width / 2
-        
+        self.drawButton.isEnabled = false
         //Delegates
         self.collectionView.delegate = self
         self.collectionView.dataSource = self
-        collectionView.reloadData()
         loadDeck()
- 
+        
+        
     }
     
     
     
     //loadDeck
     func loadDeck() {
+       
         
         let urlStr = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6"
         
         let completion = {(onlineDeck: NewDeck) in
             self.newDeck = onlineDeck
-            
+            self.drawButton.isEnabled = true
+            self.collectionView.reloadData()
         }
         
         let errorHanlder: (AppError) -> Void = {(error: AppError) in
@@ -94,12 +110,16 @@ class GameViewController: UIViewController {
     
     //loadCards
     func loadCards() {
+        
+//          currentCard = Card.init(image: (currentDeck?.cards![0].image)!, value: (currentDeck?.cards![0].value)!, suit: (currentDeck?.cards![0].suit)!)
+        
         let urlStr = "https://deckofcardsapi.com/api/deck/\(ID)/draw/?count=1"
         let completion = {(onlineDeck: Deck) in
             self.currentDeck = onlineDeck
+            print(self.currentDeck!)
         }
         
-        let errorHanlder: (AppError) -> Void = {(error: AppError) in
+        let errorHandler: (AppError) -> Void = {(error: AppError) in
             switch error{
             case .noInternetConnection:
                 print("No internet connection")
@@ -120,40 +140,59 @@ class GameViewController: UIViewController {
             }
         }
         
-        DrawCardAPIClient.manager.getCard(from: urlStr, completionHandler: completion, errorHandler: errorHanlder)
+        DrawCardAPIClient.manager.getCard(from: urlStr, completionHandler: completion, errorHandler: errorHandler)
     }
     
-}
-
-func loadImages(){
-    
+//    func loadImages(){
+//        let imageUrlStr = currentDeck?.cards![0].image
+//
+//        let completion: (UIImage) -> Void = {(onlineImage: UIImage) in
+//
+//            self.elementImage.image = onlineImage
+//
+//            self.activityIndicator.stopAnimating()
+//        }
+//        let imageError: (Error) -> Void = {(error: Error) in
+//            self.activityIndicator.stopAnimating()
+//            print(error)
+//        }
+//        activityIndicator.startAnimating()
+//        ImageAPIClient.manager.getImage(from: imageUrlStr, completionHandler: completion, errorHandler: imageError)
+        
 }
 
 
 
 //Collection View Extension
-extension GameViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    
-    
+extension GameViewController: UICollectionViewDelegate, UICollectionViewDataSource  {
+
+
     //Num of Sections
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
-    }
-    
-    //Cells
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CardCell", for: indexPath)
-        let aCard = currentDeck.cards[indexPath.row]
-        if let cell = cell as? CardCollectionViewCell {
-            print(cell.worthLabel.text = aCard.value)
-            return cell
+        if let num = self.currentDeck?.cards?.count {
+            return num
         }
         
-        return UICollectionViewCell()
-        
+        return 0
     }
-    
-    
+
+    //Cells
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        if counter > 2 {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CardCell", for: indexPath)
+//        if counter > 2 {
+        let aCard = currentDeck?.cards?[indexPath.row]
+        if let cell = cell as? CardCollectionViewCell {
+            print(cell.worthLabel.text = aCard?.value)
+            return cell
+            }
+//        }
+
+        return UICollectionViewCell()
+
+    }
+
+
 }
 
 
