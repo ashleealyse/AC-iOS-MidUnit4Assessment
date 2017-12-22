@@ -14,6 +14,7 @@ class GameViewController: UIViewController {
     @IBOutlet var currentHandValueLabel: UILabel!
     @IBOutlet var collectionView: UICollectionView!
     @IBOutlet var drawButton: UIButton!
+    //When the stop button is clicked (make action), it will reset the cards and add that game to your history and tell the user if they won or not
     @IBOutlet var stopButton: UIButton!
     
     
@@ -25,6 +26,7 @@ class GameViewController: UIViewController {
         ID = newDeck.deck_id
         loadCards()
        
+//I tried to creat and array where I would append a Card that way I could say it and allow my view to populate based on the count of that array and then from there I could keep score with those saved cards
 //        cardArr.append(currentCard)
     }
     
@@ -44,6 +46,7 @@ class GameViewController: UIViewController {
     }
     var ID = ""
     var cellSpacing = UIScreen.main.bounds.size.width * 0.05
+    var score = 0
 //    var cardArr = [Card]()
 //    var currentCard: Card!
     //View Did Load
@@ -148,18 +151,20 @@ class GameViewController: UIViewController {
 //
 //        let completion: (UIImage) -> Void = {(onlineImage: UIImage) in
 //
-//            self.elementImage.image = onlineImage
 //
-//            self.activityIndicator.stopAnimating()
 //        }
 //        let imageError: (Error) -> Void = {(error: Error) in
-//            self.activityIndicator.stopAnimating()
+//
 //            print(error)
 //        }
 //        activityIndicator.startAnimating()
 //        ImageAPIClient.manager.getImage(from: imageUrlStr, completionHandler: completion, errorHandler: imageError)
         
+
+
 }
+
+
 
 
 
@@ -179,11 +184,13 @@ extension GameViewController: UICollectionViewDelegate, UICollectionViewDataSour
     //Cells
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 //        if counter > 2 {
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CardCell", for: indexPath)
 //        if counter > 2 {
         let aCard = currentDeck?.cards?[indexPath.row]
         if let cell = cell as? CardCollectionViewCell {
             print(cell.worthLabel.text = aCard?.value)
+
             return cell
             }
 //        }
